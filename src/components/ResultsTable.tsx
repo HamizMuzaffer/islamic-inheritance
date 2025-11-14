@@ -81,7 +81,7 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
         
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="">
               <TableHead className="text-foreground font-bold">{translation.results.heir}</TableHead>
               <TableHead className="text-foreground font-bold">{translation.results.relationship}</TableHead>
               <TableHead className="text-foreground font-bold">{translation.results.share}</TableHead>

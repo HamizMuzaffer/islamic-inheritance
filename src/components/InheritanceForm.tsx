@@ -15,14 +15,17 @@ interface InheritanceFormProps {
 
 export const InheritanceForm = ({ translation, onCalculate, isRTL }: InheritanceFormProps) => {
   const [formData, setFormData] = useState<InheritanceInput>({
-    totalAssets: 0,
-    financialLiabilities: 0,
+    totalAssets: undefined,
+    financialLiabilities: undefined,
+    debtAmount: undefined,
+    bequestsAmount: undefined,
+    distributableEstate: undefined,
     genderDeceased: 'male',
     parentsStatus: 'none',
-    sons: 0,
-    daughters: 0,
-    brothers: 0,
-    sisters: 0,
+    sons: undefined,
+    daughters: undefined,
+    brothers: undefined,
+    sisters: undefined,
     hasSpouse: false,
   });
 
@@ -53,6 +56,42 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
               min="0"
               value={formData.totalAssets}
               onChange={(e) => updateField('totalAssets', parseFloat(e.target.value) || 0)}
+              className="bg-input"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="debtAmount">{translation.form.debtAmount}</Label>
+            <Input
+              id="debtAmount"
+              type="number"
+              min="0"
+              value={formData.debtAmount}
+              onChange={(e) => updateField('debtAmount', parseFloat(e.target.value) || 0)}
+              className="bg-input"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bequestsAmount">{translation.form.bequestsAmount}</Label>
+            <Input
+              id="bequestsAmount"
+              type="number"
+              min="0"
+              value={formData.bequestsAmount}
+              onChange={(e) => updateField('bequestsAmount', parseFloat(e.target.value) || 0)}
+              className="bg-input"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="distributableEstate">{translation.form.distributableEstate}</Label>
+            <Input
+              id="distributableEstate"
+              type="number"
+              min="0"
+              value={formData.distributableEstate}
+              onChange={(e) => updateField('distributableEstate', parseFloat(e.target.value) || 0)}
               className="bg-input"
               required
             />

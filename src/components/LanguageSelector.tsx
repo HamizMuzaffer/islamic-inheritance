@@ -18,6 +18,10 @@ const languages = [
 ];
 
 export const LanguageSelector = ({ currentLanguage, onLanguageChange }: LanguageSelectorProps) => {
+  const handleLanguageChange = (language: string) => {
+    localStorage.setItem('preferredLanguage', language);
+    onLanguageChange(language);
+  }
   return (
     <div className="bg-card rounded-lg p-6 border border-border h-fit sticky top-6">
       <h3 className="text-lg font-semibold mb-4 text-accent">Languages</h3>
@@ -25,7 +29,7 @@ export const LanguageSelector = ({ currentLanguage, onLanguageChange }: Language
         {languages.map((lang) => (
           <Button
             key={lang.code}
-            onClick={() => onLanguageChange(lang.code)}
+            onClick={() => handleLanguageChange(lang.code)}
             variant={currentLanguage === lang.code ? "default" : "secondary"}
             className="w-full justify-start text-left transition-all"
           >

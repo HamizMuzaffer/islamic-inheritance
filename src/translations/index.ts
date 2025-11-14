@@ -5,7 +5,10 @@ export interface Translation {
   form: {
     title: string;
     totalAssets: string;
+    debtAmount : string;
     financialLiabilities: string;
+    bequestsAmount : string;
+    distributableEstate: string;
     genderDeceased: string;
     male: string;
     female: string;
@@ -45,6 +48,9 @@ export const translations: Record<string, Translation> = {
     form: {
       title: "Inheritance Details",
       totalAssets: "Total Assets",
+      debtAmount : "Total amount of debt owed by the deceased to individuals or institutions",
+      bequestsAmount : "Total amount of bequests made by the deceased in their will",
+      distributableEstate: "Total amount of the distributable estate",
       financialLiabilities: "Financial Liabilities (Debts)",
       genderDeceased: "Gender of Deceased",
       male: "Male",
@@ -84,6 +90,9 @@ export const translations: Record<string, Translation> = {
       title: "وراثت کی تفصیلات",
       totalAssets: "کل اثاثے",
       financialLiabilities: "مالی ذمہ داریاں (قرض)",
+      debtAmount : "میت کے ذمہ افراد اور اداروں کی واجب الادا قرض کی کُل رقم",
+      bequestsAmount : "میت کی اداروں یا افراد کے حق میں کی گئی وصیت کی کُل رقم",
+      distributableEstate: "قابلِ تقسیم ترکےکی کل رقم",
       genderDeceased: "میت کی جنس",
       male: "مرد",
       female: "عورت",
@@ -110,7 +119,7 @@ export const translations: Record<string, Translation> = {
       relationship: "رشتہ",
       share: "حصہ",
       amount: "رقم",
-      downloadPDF: "PDF ڈاؤن لوڈ کریں",
+      downloadPDF: "حسابات کی رپورٹ پی ڈی ایف (pdf) کی شکل میں حاصل کریں",
       netEstate: "خالص ترکہ (قرض کے بعد)",
     },
   },
@@ -122,6 +131,9 @@ export const translations: Record<string, Translation> = {
       title: "विरासत विवरण",
       totalAssets: "कुल संपत्ति",
       financialLiabilities: "वित्तीय देनदारियां (ऋण)",
+      debtAmount : "मृतक द्वारा व्यक्तियों या संस्थानों को देय कुल ऋण राशि",
+      bequestsAmount : "मृतक द्वारा अपनी वसीयत में किए गए वसीयत की कुल राशि",
+      distributableEstate: "वितरणीय संपत्ति की कुल राशि",
       genderDeceased: "मृतक का लिंग",
       male: "पुरुष",
       female: "महिला",
@@ -160,6 +172,9 @@ export const translations: Record<string, Translation> = {
       title: "উত্তরাধিকার বিবরণ",
       totalAssets: "মোট সম্পদ",
       financialLiabilities: "আর্থিক দায় (ঋণ)",
+      debtAmount : "মৃতক দ্বারা ব্যক্তিদের বা প্রতিষ্ঠানগুলিকে দেওয়া মোট ঋণের পরিমাণ",
+      bequestsAmount : "মৃতক দ্বারা প্রতিষ্ঠিত ব্যক্তিদের বা প্রতিষ্ঠানগুলির জন্য করা وصیتের মোট পরিমাণ",
+      distributableEstate: "বিতরণযোগ্য সম্পত্তির মোট পরিমাণ",
       genderDeceased: "মৃতের লিঙ্গ",
       male: "পুরুষ",
       female: "মহিলা",
@@ -198,6 +213,9 @@ export const translations: Record<string, Translation> = {
       title: "تفاصيل الميراث",
       totalAssets: "إجمالي الأصول",
       financialLiabilities: "الالتزامات المالية (الديون)",
+      debtAmount : "إجمالي مبلغ الدين المستحق على المتوفى للأفراد أو المؤسسات",
+      bequestsAmount : "إجمالي مبلغ الوصايا التي قام بها المتوفى في وصيته",
+      distributableEstate: "إجمالي مبلغ التركة القابلة للتوزيع",
       genderDeceased: "جنس المتوفى",
       male: "ذكر",
       female: "أنثى",
@@ -236,6 +254,9 @@ export const translations: Record<string, Translation> = {
       title: "Rincian Warisan",
       totalAssets: "Total Aset",
       financialLiabilities: "Kewajiban Keuangan (Hutang)",
+      debtAmount : "Jumlah total hutang yang terutang oleh almarhum kepada individu atau institusi",
+      bequestsAmount : "Jumlah total wasiat yang dibuat oleh almarhum dalam wasiatnya",
+      distributableEstate: "Jumlah total harta warisan yang dapat dibagikan",
       genderDeceased: "Jenis Kelamin Almarhum",
       male: "Laki-laki",
       female: "Perempuan",
@@ -274,6 +295,9 @@ export const translations: Record<string, Translation> = {
       title: "Butiran Pusaka",
       totalAssets: "Jumlah Aset",
       financialLiabilities: "Liabiliti Kewangan (Hutang)",
+      debtAmount : "Jumlah keseluruhan hutang yang terhutang oleh si mati kepada individu atau institusi",
+      bequestsAmount : "Jumlah keseluruhan wasiat yang dibuat oleh si mati dalam wasiatnya",
+      distributableEstate: "Jumlah keseluruhan harta pusaka yang boleh diagihkan",
       genderDeceased: "Jantina Si Mati",
       male: "Lelaki",
       female: "Perempuan",
@@ -312,6 +336,9 @@ export const translations: Record<string, Translation> = {
       title: "Détails de l'Héritage",
       totalAssets: "Actifs Totaux",
       financialLiabilities: "Passifs Financiers (Dettes)",
+      debtAmount : "Montant total des dettes dues par le défunt à des particuliers ou des institutions",
+      bequestsAmount : "Montant total des legs faits par le défunt dans son testament",
+      distributableEstate: "Montant total de la succession distribuable",
       genderDeceased: "Sexe du Défunt",
       male: "Homme",
       female: "Femme",

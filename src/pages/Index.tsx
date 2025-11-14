@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { translations } from "@/translations";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { QuranVerse } from "@/components/QuranVerse";
@@ -6,7 +6,15 @@ import { InheritanceForm } from "@/components/InheritanceForm";
 import { ResultsTable } from "@/components/ResultsTable";
 import { calculateInheritance, InheritanceInput, Heir } from "@/utils/inheritanceCalculator";
 
+
 const Index = () => {
+
+  useEffect(() => {
+    const language = localStorage.getItem('preferredLanguage') || localStorage.setItem('preferredLanguage', 'english');
+    if (language) {
+      setCurrentLanguage(language);
+    }
+  }, []);
   const [currentLanguage, setCurrentLanguage] = useState('english');
   const [heirs, setHeirs] = useState<Heir[]>([]);
   const [netEstate, setNetEstate] = useState(0);

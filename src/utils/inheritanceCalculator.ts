@@ -1,5 +1,8 @@
 export interface InheritanceInput {
   totalAssets: number;
+  debtAmount: number;
+  bequestsAmount: number;
+  distributableEstate: number;
   financialLiabilities: number;
   genderDeceased: 'male' | 'female';
   parentsStatus: 'father' | 'mother' | 'both' | 'none';
