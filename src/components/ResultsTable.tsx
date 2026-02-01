@@ -1,5 +1,5 @@
 import { Translation } from "@/translations";
-import { Heir } from "@/utils/inheritanceCalculator";
+import { Heir, HeirNameKey, ShareKey } from "@/utils/inheritanceCalculator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,39 +22,47 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
     }).format(amount);
   };
 
+  // ─── Translate structured keys from the calculator into display strings ────
+  // The calculator returns keys like 'wife', { key: 'son', index: 2 }, '2x_residue'
+  // This layer converts them using the active translation object.
+
+  const translateName = (nameKey: HeirNameKey): string => {
+    if (typeof nameKey === 'string') {
+      // Simple keys: 'wife', 'husband', 'father', 'mother'
+      return translation.heirs[nameKey];
+    }
+    // Indexed keys: { key: 'son', index: 2 } → "ابن 2" or "Son 2"
+    return `${translation.heirs[nameKey.key]} ${nameKey.index}`;
+  };
+
+  const translateRelationship = (key: string): string => {
+    return translation.relationships[key] ?? key;
+  };
+
+  const translateShare = (shareKey: ShareKey): string => {
+    // Special keys get translated; plain fraction strings like '1/6' pass through
+    if (shareKey in translation.shares) {
+      return translation.shares[shareKey];
+    }
+    return shareKey;
+  };
+
   const downloadPDF = () => {
-    // Get the element to convert to PDF
     const element = document.getElementById('pdf-content');
-    
     if (!element) {
       console.error('PDF content element not found');
       return;
     }
 
-    // Configure html2pdf options
     const options = {
       margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: 'inheritance-calculation.pdf',
-      image: { 
-        type: 'jpeg', 
-        quality: 0.98 
-      },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        letterRendering: true,
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' 
-      },
-      pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'] 
-      }
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
     };
 
-    // Generate and download PDF
     html2pdf()
       .set(options)
       .from(element)
@@ -65,12 +73,12 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
   };
 
   return (
-    <Card className="mt-6 bg-card border-border" dir={isRTL ? 'rtl' : 'ltr'}>
+    <Card className="mt-6 bg-white border-border" dir={isRTL ? 'rtl' : 'ltr'}>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl font-bold text-primary">
           {translation.results.title}
         </CardTitle>
-        <Button 
+        <Button
           onClick={downloadPDF}
           className="bg-accent hover:bg-accent/90 text-accent-foreground print:hidden"
         >
@@ -79,22 +87,22 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
         </Button>
       </CardHeader>
       <CardContent>
-        {/* PDF Content - This section will be converted to PDF */}
         <div id="pdf-content" dir={isRTL ? 'rtl' : 'ltr'}>
-          {/* Header for PDF */}
+          {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-primary mb-4">
               {translation.appTitle}
             </h1>
           </div>
 
-          {/* Net Estate Section */}
+          {/* Net Estate — use text-foreground for guaranteed contrast on bg-secondary */}
           <div className="mb-6 p-4 bg-secondary rounded-lg">
             <p className="text-lg font-semibold text-foreground">
-              {translation.results.netEstate}: <span className="text-accent">{formatCurrency(netEstate)}</span>
+              {translation.results.netEstate}:{' '}
+              <span className="font-bold text-foreground">{formatCurrency(netEstate)}</span>
             </p>
           </div>
-          
+
           {/* Results Table */}
           <Table>
             <TableHeader>
@@ -113,19 +121,20 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="bg-gray-900">
               {heirs.map((heir, index) => (
                 <TableRow key={index}>
-                  <TableCell className="text-accent font-medium border border-border">
-                    {heir.name}
+                  {/* text-foreground ensures readable contrast on any bg-card */}
+                  <TableCell className="text-foreground font-medium border border-border">
+                    {translateName(heir.nameKey)}
                   </TableCell>
-                  <TableCell className="text-accent border border-border">
-                    {heir.relationship}
+                  <TableCell className="text-foreground border border-border">
+                    {translateRelationship(heir.relationshipKey)}
                   </TableCell>
-                  <TableCell className="text-accent border border-border">
-                    {heir.share}
+                  <TableCell className="text-foreground border border-border">
+                    {translateShare(heir.shareKey)}
                   </TableCell>
-                  <TableCell className="text-accent font-semibold border border-border">
+                  <TableCell className="text-foreground font-semibold border border-border">
                     {formatCurrency(heir.amount)}
                   </TableCell>
                 </TableRow>
@@ -133,9 +142,9 @@ export const ResultsTable = ({ translation, heirs, netEstate, isRTL }: ResultsTa
             </TableBody>
           </Table>
 
-          {/* Footer - Optional timestamp */}
+          {/* Footer — translated */}
           <div className="mt-6 text-sm text-muted-foreground">
-            <p>Generated on: {new Date().toLocaleDateString()}</p>
+            <p>{translation.results.generatedOn}: {new Date().toLocaleDateString()}</p>
           </div>
         </div>
       </CardContent>

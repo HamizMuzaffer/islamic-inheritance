@@ -54,6 +54,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
               id="totalAssets"
               type="number"
               min="0"
+              placeholder="0"
               value={formData.totalAssets}
               onChange={(e) => updateField('totalAssets', parseFloat(e.target.value) || 0)}
               className="bg-input"
@@ -66,6 +67,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
               id="debtAmount"
               type="number"
               min="0"
+              placeholder="0"
               value={formData.debtAmount}
               onChange={(e) => updateField('debtAmount', parseFloat(e.target.value) || 0)}
               className="bg-input"
@@ -78,6 +80,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
               id="bequestsAmount"
               type="number"
               min="0"
+              placeholder="0"
               value={formData.bequestsAmount}
               onChange={(e) => updateField('bequestsAmount', parseFloat(e.target.value) || 0)}
               className="bg-input"
@@ -90,6 +93,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
               id="distributableEstate"
               type="number"
               min="0"
+              placeholder="0"
               value={formData.distributableEstate}
               onChange={(e) => updateField('distributableEstate', parseFloat(e.target.value) || 0)}
               className="bg-input"
@@ -103,6 +107,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
             <Input
               id="liabilities"
               type="number"
+              placeholder="0"
               min="0"
               value={formData.financialLiabilities}
               onChange={(e) => updateField('financialLiabilities', parseFloat(e.target.value) || 0)}
@@ -182,6 +187,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
                   id="sons"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={formData.sons}
                   onChange={(e) => updateField('sons', parseInt(e.target.value) || 0)}
                   className="bg-input"
@@ -193,6 +199,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
                   id="daughters"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={formData.daughters}
                   onChange={(e) => updateField('daughters', parseInt(e.target.value) || 0)}
                   className="bg-input"
@@ -211,6 +218,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
                   id="brothers"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={formData.brothers}
                   onChange={(e) => updateField('brothers', parseInt(e.target.value) || 0)}
                   className="bg-input"
@@ -222,6 +230,7 @@ export const InheritanceForm = ({ translation, onCalculate, isRTL }: Inheritance
                   id="sisters"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={formData.sisters}
                   onChange={(e) => updateField('sisters', parseInt(e.target.value) || 0)}
                   className="bg-input"
