@@ -17,17 +17,18 @@ const Index = () => {
   }, []);
   const [currentLanguage, setCurrentLanguage] = useState('english');
   const [heirs, setHeirs] = useState<Heir[]>([]);
-  const [netEstate, setNetEstate] = useState(0);
+  const [netEstate, setNetEstate] = useState<number>(0);
   
   const translation = translations[currentLanguage];
   const isRTL = ['urdu', 'arabic'].includes(currentLanguage);
 
-  const handleCalculate = (data: InheritanceInput) => {
-    const calculatedHeirs = calculateInheritance(data);
-    setHeirs(calculatedHeirs);
-    setNetEstate(data.totalAssets - data.financialLiabilities);
+  const handleCalculate = (input: InheritanceInput) => {
+    // ─── UPDATED: destructure both heirs and netEstate ───────────────────
+    const { heirs, netEstate } = calculateInheritance(input);
+    
+    setHeirs(heirs);
+    setNetEstate(netEstate);  // ← This value is now guaranteed to be a finite number
   };
-
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto max-w-7xl">

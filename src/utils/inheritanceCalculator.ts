@@ -2,7 +2,6 @@ export interface InheritanceInput {
   totalAssets: number;
   debtAmount: number;
   bequestsAmount: number;
-  distributableEstate: number;
   financialLiabilities: number;
   genderDeceased: 'male' | 'female';
   parentsStatus: 'father' | 'mother' | 'both' | 'none';
@@ -36,32 +35,34 @@ export interface Heir {
   amount: number;
 }
 
-// ─── Coerce any value to a safe, finite number. ─────────────────────────────
-// Handles: undefined, null, NaN, Infinity, empty-string, stray objects.
-// Everything that isn't a finite number becomes 0.
+export interface InheritanceResult {
+  heirs: Heir[];
+  netEstate: number;
+}
+
+// ─── Coerce any value to a safe, finite number ──────────────────────────────
 function sanitizeNum(val: unknown): number {
   const n = Number(val);
   return isFinite(n) ? n : 0;
 }
 
-export function calculateInheritance(input: InheritanceInput): Heir[] {
-  // Sanitize every numeric field once, up front.
-  // This is the single guard that prevents NaN from entering any calculation.
-  // Without it: undefined - 0 → NaN, Math.max(0, NaN) → NaN, NaN * fraction → NaN.
+export function calculateInheritance(input: InheritanceInput): InheritanceResult {
   const totalAssets          = sanitizeNum(input.totalAssets);
   const financialLiabilities = sanitizeNum(input.financialLiabilities);
   const debtAmount           = sanitizeNum(input.debtAmount);
   const bequestsAmount       = sanitizeNum(input.bequestsAmount);
-  const distributableEstate  = sanitizeNum(input.distributableEstate);
   const sons                 = sanitizeNum(input.sons);
   const daughters            = sanitizeNum(input.daughters);
   const brothers             = sanitizeNum(input.brothers);
   const sisters              = sanitizeNum(input.sisters);
 
-  const netEstate =
-    distributableEstate > 0
-      ? distributableEstate
-      : Math.max(0, totalAssets - financialLiabilities - debtAmount - bequestsAmount);
+  // ─── Single source of truth. Always derived, never overridden. ───────────
+  // The form shows this same value as a read-only "Distributable Estate" so
+  // the user always sees exactly what number feeds the calculation.
+  const netEstate = Math.max(
+    0,
+    totalAssets - financialLiabilities - debtAmount - bequestsAmount
+  );
 
   const heirs: Heir[] = [];
   const hasChildren = sons > 0 || daughters > 0;
@@ -95,6 +96,7 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
   // Parents
   if (input.parentsStatus !== 'none') {
     if (hasChildren) {
+      // Both parents get 1/6 each when children exist
       if (input.parentsStatus === 'both' || input.parentsStatus === 'father') {
         fixedShares.push({ nameKey: 'father', relationshipKey: 'parent', fraction: 1 / 6 });
       }
@@ -102,19 +104,23 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
         fixedShares.push({ nameKey: 'mother', relationshipKey: 'parent', fraction: 1 / 6 });
       }
     } else {
+      // No children: mother gets 1/6 (with spouse) or 1/3 (without spouse)
       if (input.parentsStatus === 'both' || input.parentsStatus === 'mother') {
         const motherFraction = input.hasSpouse ? 1 / 6 : 1 / 3;
         fixedShares.push({ nameKey: 'mother', relationshipKey: 'parent', fraction: motherFraction });
       }
-      // Father gets residue — handled in Step 4
+      // Father gets residue when no children — handled in Step 4
     }
   }
 
   // Daughters-only fixed share (no sons present)
+  // Islamic law: daughters without sons have a FIXED share, not residue.
+  //   1 daughter  → 1/2
+  //   2+ daughters → 2/3 total, split equally
   if (hasChildren && !hasSons) {
     const daughtersTotalFraction = daughters === 1 ? 1 / 2 : 2 / 3;
     fixedShares.push({
-      nameKey: { key: 'daughter', index: 0 }, // placeholder, expanded below
+      nameKey: { key: 'daughter', index: 0 }, // placeholder, expanded in Step 3
       relationshipKey: 'child',
       fraction: daughtersTotalFraction,
       count: daughters,
@@ -122,12 +128,17 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
   }
 
   // ─── STEP 2: Awl (عول) ──────────────────────────────────────────────────
+  // When fixed shares sum to more than 1, every share is proportionally
+  // reduced by dividing each fraction by the total.
+  // Example: H=1/4 + F=1/6 + M=1/6 + 2D=2/3 = 15/12 > 1
+  //   → awlDivisor = 15/12, each fraction divided by 15/12.
   const totalFixed = fixedShares.reduce((sum, s) => sum + s.fraction, 0);
   const awlDivisor = totalFixed > 1 ? totalFixed : 1;
 
   // ─── STEP 3: Build heir list from fixed shares ──────────────────────────
   for (const s of fixedShares) {
     if (s.count && s.count > 0 && typeof s.nameKey === 'object' && s.nameKey.key === 'daughter') {
+      // Expand the daughters placeholder into individual heirs
       const eachFraction = s.fraction / s.count;
       for (let i = 1; i <= s.count; i++) {
         heirs.push({
@@ -152,6 +163,7 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
   let remainingAmount = netEstate - distributedAmount;
 
   if (hasSons) {
+    // Sons make all children residue takers. Sons get 2x, daughters get 1x.
     const totalChildShares = sons * 2 + daughters;
     const shareUnit = remainingAmount / totalChildShares;
 
@@ -173,7 +185,9 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
     }
     remainingAmount = 0;
   } else if (!hasChildren) {
+    // No children at all — residue goes to father, then siblings, then fallback
     if (input.parentsStatus === 'father' || input.parentsStatus === 'both') {
+      // Father as asaba blocks all siblings
       heirs.push({
         nameKey: 'father',
         relationshipKey: 'parent',
@@ -182,6 +196,7 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
       });
       remainingAmount = 0;
     } else {
+      // No father — siblings take residue (brothers 2x, sisters 1x)
       const totalSiblingShares = brothers * 2 + sisters;
       if (totalSiblingShares > 0) {
         const shareUnit = remainingAmount / totalSiblingShares;
@@ -203,7 +218,7 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
         }
         remainingAmount = 0;
       } else {
-        // No asaba at all — remainder returns to mother, then spouse
+        // No asaba at all — remainder returns to closest fixed-share heir
         const motherHeir = heirs.find((h) => h.nameKey === 'mother');
         if (motherHeir) {
           motherHeir.amount += remainingAmount;
@@ -221,7 +236,7 @@ export function calculateInheritance(input: InheritanceInput): Heir[] {
     }
   }
 
-  return heirs;
+  return { heirs, netEstate };
 }
 
 function formatFraction(decimal: number): string {
